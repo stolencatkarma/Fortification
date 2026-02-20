@@ -1,0 +1,79 @@
+# Ignore Visual Studio temporary files, build outputs, and user-specific files
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.ncb
+*.cache
+
+# Build folders
+[Bb]in/
+[Oo]bj/
+build/
+Debug/
+Release/
+Standalone/
+
+# MSBuild generated files
+*.tlog
+*.lastbuildstate
+*.intermediate.manifest
+*.lastbuildstate
+Release\*.lastbuildstate
+Release\*.intermediate.manifest
+
+# Output binaries and libraries
+Release/*.dll
+Release/*.lib
+Release/*.pdb
+*.dll
+*.lib
+*.exp
+*.ilk
+*.idb
+*.obj
+*.o
+
+# Linker and compiler artifacts
+*.pdb
+*.idb
+*.ipdb
+*.sbr
+*.tlh
+*.tli
+
+# Logs
+*.log
+*.vspscc
+
+# User-specific Visual Studio files
+*.vcxproj.user
+*.suo
+
+# Generated manifest and temp files
+*.manifest
+*.tmp
+*.temp
+
+# Ignore OS files
+Thumbs.db
+desktop.ini
+
+# Ignore backup and editor swap files
+*.bak
+*.swp
+*.~* 
+
+# Git hooks or local env
+.env
+
+# Ignore build output folder created by this project
+Release/
+
+# Keep this file tracked
+!.gitignore

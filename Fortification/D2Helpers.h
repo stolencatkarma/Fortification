@@ -11,6 +11,7 @@ DWORD	GetTileLevelNo(Room2* lpRoom2, DWORD dwTileNo);
 LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 UnitAny* __fastcall FindItem(DWORD dwCode, INT nLoc);
+UnitAny* __fastcall FindItemByCode(LPCSTR lpszCode, INT nLoc);
 BOOL Portal();
 BOOL GetItemCode(UnitAny* pItem, LPSTR szBuffer, DWORD dwMax);
 
@@ -49,3 +50,4 @@ VOID AttackLeftMonster();
 
 BOOL AutoPrecast();
 void ResetPrecast();
+void DumpInventoryItems();

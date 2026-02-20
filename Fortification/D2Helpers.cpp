@@ -96,13 +96,13 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				ResetBot();
 
 				if (v_Bot)
-				PrintConsoleString("ÿc4Launched Avatar Plugin: You Are Now Botting...");
+				PrintConsoleString("ï¿½c4Launched Avatar Plugin: You Are Now Botting...");
 				else
-				PrintConsoleString("ÿc4Stopped Avatar Plugin: Bot Stopped.");
+				PrintConsoleString("ï¿½c4Stopped Avatar Plugin: Bot Stopped.");
 				}
 				else
 				{
-					PrintText(0, "ÿc1WARNING! You Must Be In Harrogath Above The Stairs To Launch Avatar.");
+					PrintText(0, "ï¿½c1WARNING! You Must Be In Harrogath Above The Stairs To Launch Avatar.");
 				}
 			}
 
@@ -113,7 +113,7 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (v_AutoRejuvPercent >= 100)
 					v_AutoRejuvPercent = 0;
 
-				PrintConsoleString("ÿc4Changed Auto Rejuv To %d", v_AutoRejuvPercent);
+				PrintConsoleString("ï¿½c4Changed Auto Rejuv To %d", v_AutoRejuvPercent);
 			}
 
 			if (wParam == 102 && ((lParam &0x4000) == 0)) //Maphack Toggle
@@ -121,9 +121,9 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				v_Maphack = !v_Maphack;
 
 				if (v_Maphack)
-					PrintConsoleString("ÿc4Maphack Enabled, Fortification Will Automatically Reveal Map");
+					PrintConsoleString("ï¿½c4Maphack Enabled, Fortification Will Automatically Reveal Map");
 				else
-					PrintConsoleString("ÿc4Maphack Disabled, Fortification Will Not Reveal Map");
+					PrintConsoleString("ï¿½c4Maphack Disabled, Fortification Will Not Reveal Map");
 			}
 
 			if (wParam == 101 && ((lParam &0x4000) == 0)) //PickIt Config
@@ -133,9 +133,9 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					v_PickItConfig = !v_PickItConfig;
 
 					if (v_PickItConfig)
-						PrintConsoleString("ÿc4Opened PickIt Config, Pass Your Mouse On Features To Enable Or Disable");
+						PrintConsoleString("ï¿½c4Opened PickIt Config, Pass Your Mouse On Features To Enable Or Disable");
 					else
-						PrintConsoleString("ÿc4Closed PickIt Config");
+						PrintConsoleString("ï¿½c4Closed PickIt Config");
 				}
 			}
 
@@ -148,7 +148,7 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (v_TownLife >= 100)
 					v_TownLife = 0;
 
-				PrintConsoleString("ÿc4Changed Town Life To %d", v_TownLife);
+				PrintConsoleString("ï¿½c4Changed Town Life To %d", v_TownLife);
 				}
 			}
 
@@ -161,7 +161,7 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (v_ExitLife >= 100)
 					v_ExitLife = 0;
 
-				PrintConsoleString("ÿc4Changed Exit Life To %d", v_ExitLife);
+				PrintConsoleString("ï¿½c4Changed Exit Life To %d", v_ExitLife);
 				}
 			}
 
@@ -172,9 +172,9 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				v_PickIt = !v_PickIt; 
 
 				if (v_PickIt)
-					PrintConsoleString("ÿc4Divin's PickIt: Set To Enabled");
+					PrintConsoleString("ï¿½c4Divin's PickIt: Set To Enabled");
 				else
-					PrintConsoleString("ÿc4Divin's PickIt: Set To Disabled");
+					PrintConsoleString("ï¿½c4Divin's PickIt: Set To Disabled");
 				}
 			}
 
@@ -185,9 +185,18 @@ LONG WINAPI GameEventHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				v_GUI = !v_GUI;
 
 				if (v_GUI)
-					PrintText(0,"ÿc9Fortification: ÿc0Normal GUI Mode");
+					PrintText(0,"ï¿½c9Fortification: ï¿½c0Normal GUI Mode");
 				else
-					PrintText(0,"ÿc9Fortification: ÿc0Stealth GUI Mode");
+					PrintText(0,"ï¿½c9Fortification: ï¿½c0Stealth GUI Mode");
+				}
+			}
+
+			if (wParam == 123 && ((lParam &0x4000) == 0)) //F12 - Dump inventory items diagnostic
+			{
+				if (!GetUIVar(UI_CHAT))
+				{
+					DumpInventoryItems();
+					PrintText(0, "ï¿½c4Diagnostic: Inventory dump complete.");
 				}
 			}
 
@@ -425,6 +434,46 @@ BOOL GetItemCode(UnitAny* pItem, LPSTR szBuffer, DWORD dwMax)
 	return (int)strlen(szBuffer);
 }
 
+// Diagnostic: dump inventory items (txt id, code, location, potion type, ammo)
+void DumpInventoryItems()
+{
+	if (!GameReady())
+		return;
+
+	UnitAny* Item = pMe->pInventory->pFirstItem;
+
+	if (!Item)
+	{
+		PrintText(0, "DIAG: No inventory items found.");
+		return;
+	}
+
+	for (; Item; Item = Item->pItemData->pNextInvItem)
+	{
+		if (Item->dwType != UNIT_TYPE_ITEM)
+			continue;
+
+		CHAR Code[4] = {0};
+		GetItemCode(Item, Code, 3);
+		INT loc = GetItemLocation(Item);
+		INT potionType = D2IsPotion(Code);
+		INT ammo = (INT)GetUnitStat(Item, STAT_AMMOQUANTITY);
+
+		const char* locStr = "UNKNOWN";
+		switch (loc)
+		{
+		case STORAGE_INVENTORY: locStr = "INVENTORY"; break;
+		case STORAGE_BELT: locStr = "BELT"; break;
+		case STORAGE_CUBE: locStr = "CUBE"; break;
+		case STORAGE_STASH: locStr = "STASH"; break;
+		case STORAGE_EQUIP: locStr = "EQUIP"; break;
+		default: locStr = "OTHER"; break;
+		}
+
+		PrintText(0, "DIAG: TxtNo=%d Code=%s Loc=%s Potion=%d Ammo=%d", Item->dwTxtFileNo, Code, locStr, potionType, ammo);
+	}
+}
+
 INT GetTotalBeltTPs()
 {
 	INT TotalItems = 0;
@@ -635,18 +684,18 @@ Minor Mana Potion: 594
 BOOL Mana()
 {
 	LPUNITANY Item = NULL;
-	DWORD ItemCodes[5] = {598, 597, 596, 595, 594}; //Fixed For PD2
+	LPCSTR ItemCodes[] = { "mp5", "mp4", "mp3", "mp2", "mp1" };
 
 	if (!GameReady() || InTown(pMe) || pMe->pInventory->pCursorItem)
 		return FALSE;
 
-	for (INT i = 0; i < ArraySize(ItemCodes); i++)
+	for (INT i = 0; i < (INT)ArraySize(ItemCodes); i++)
 	{
-		Item = FindItem(ItemCodes[i], STORAGE_STASH);
+		Item = FindItemByCode(ItemCodes[i], STORAGE_STASH);
 
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_BELT);
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_INVENTORY);
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_CUBE);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_BELT);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_INVENTORY);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_CUBE);
 		if (!Item) continue;
 
 		UseItem(Item);
@@ -681,18 +730,18 @@ BOOL AutoMana()
 BOOL Rejuvenation()
 {
 	LPUNITANY Item = NULL;
-	DWORD ItemCodes[2] = {518, 517}; //Fixed For PD2
+	LPCSTR ItemCodes[] = { "rvl", "rvs" };
 
 	if (!GameReady() || pMe->pInventory->pCursorItem)
 		return FALSE;
-	
-	for (INT i = 0; i < ArraySize(ItemCodes); i++)
-	{
-		Item = FindItem(ItemCodes[i], STORAGE_STASH);
 
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_BELT);
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_INVENTORY);
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_CUBE);
+	for (INT i = 0; i < (INT)ArraySize(ItemCodes); i++)
+	{
+		Item = FindItemByCode(ItemCodes[i], STORAGE_STASH);
+
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_BELT);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_INVENTORY);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_CUBE);
 		if (!Item) continue;
 
 		UseItem(Item);
@@ -730,18 +779,18 @@ BOOL AutoJuv()
 BOOL Health()
 {
 	LPUNITANY Item = NULL;
-	DWORD ItemCodes[5] = {593, 592, 591, 590, 589}; //Fixed For PD2
+	LPCSTR ItemCodes[] = { "hp5", "hp4", "hp3", "hp2", "hp1" };
 
 	if (!GameReady() || InTown(pMe) || pMe->pInventory->pCursorItem)
 		return FALSE;
 
-	for (INT i = 0; i < ArraySize(ItemCodes); i++)
+	for (INT i = 0; i < (INT)ArraySize(ItemCodes); i++)
 	{
-		Item = FindItem(ItemCodes[i], STORAGE_STASH);
+		Item = FindItemByCode(ItemCodes[i], STORAGE_STASH);
 
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_BELT);
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_INVENTORY);
-		if (!Item) Item = FindItem(ItemCodes[i], STORAGE_CUBE);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_BELT);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_INVENTORY);
+		if (!Item) Item = FindItemByCode(ItemCodes[i], STORAGE_CUBE);
 		if (!Item) continue;
 
 		UseItem(Item);
@@ -1248,7 +1297,7 @@ BOOL AutoPrecast()
 {
 	if (!Switch)
 	{
-	PrintText(0,"ÿc9Avatar: ÿc0Switching Weapon");
+	PrintText(0,"ï¿½c9Avatar: ï¿½c0Switching Weapon");
 	keybd_event(87, 0, 0, 0);
   	keybd_event(87, 0, KEYEVENTF_KEYUP, 0);
 	TheDelay = GetTickCount();
@@ -1259,7 +1308,7 @@ BOOL AutoPrecast()
 	{
 	if (GetTickCount() - TheDelay >= 500)
 	{
-	PrintText(0,"ÿc9Avatar: ÿc0Casting Right Skill 1");
+	PrintText(0,"ï¿½c9Avatar: ï¿½c0Casting Right Skill 1");
 
 	WORD Skill = GetCurrentSkill(FALSE);
 
@@ -1274,7 +1323,7 @@ BOOL AutoPrecast()
 	{
 	if (GetTickCount() - TheDelay >= 500)
 	{
-	PrintText(0,"ÿc9Avatar: ÿc0Casting Right Skill 2");
+	PrintText(0,"ï¿½c9Avatar: ï¿½c0Casting Right Skill 2");
 
 	WORD Skill = GetCurrentSkill(FALSE);
 
@@ -1289,7 +1338,7 @@ BOOL AutoPrecast()
 	{
 	if (GetTickCount() - TheDelay >= 500)
 	{
-	PrintText(0,"ÿc9Avatar: ÿc0Switching Weapon Back");
+	PrintText(0,"ï¿½c9Avatar: ï¿½c0Switching Weapon Back");
 	keybd_event(87, 0, 0, 0);
   	keybd_event(87, 0, KEYEVENTF_KEYUP, 0);
 	
@@ -1322,4 +1371,31 @@ void ResetPrecast()
 	CheckMainA = false;
 	CheckMainB = false;
 	TheDelay = NULL;
+}
+
+UnitAny* __fastcall FindItemByCode(LPCSTR lpszCode, INT nLoc)
+{
+	if (!GameReady() || !lpszCode)
+		return NULL;
+
+	CHAR Code[4] = {0};
+
+	for (UnitAny* Item = pMe->pInventory->pFirstItem; Item; Item = Item->pItemData->pNextInvItem)
+	{
+		if (Item->dwType != UNIT_TYPE_ITEM)
+			continue;
+
+		GetItemCode(Item, Code, 3);
+
+		if (!_stricmp(Code, lpszCode))
+		{
+			if (Item->dwTxtFileNo == 520 && GetUnitStat(Item, STAT_AMMOQUANTITY) == 0) //Fixed For PD2
+				continue;
+
+			if (GetItemLocation(Item) == nLoc)
+				return Item;
+		}
+	}
+
+	return NULL;
 }
